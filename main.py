@@ -10,9 +10,10 @@ from sqlalchemy.orm import relationship
 from flask_login import UserMixin, LoginManager, login_user, current_user, logout_user, login_required
 from forms import CreatePostForm, RegisterUserForm, LogInUserForm, CreateComment
 from flask_gravatar import Gravatar
+import os
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = '8BYkEfBA6O6donzWlSihBXox7C0sKR6b'
+app.config['SECRET_KEY'] = os.environ.get("SECRET_KEY")
 ckeditor = CKEditor(app)
 Bootstrap(app)
 
@@ -26,7 +27,9 @@ gravatar = Gravatar(app,
                     base_url=None)
 
 # CONNECT TO DB
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///blog.db'
+# "DATABASE_URL" to run in heroku.com
+# "sqlite:///blog.db" to run in local form
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DATABASE_URL",  "sqlite:///blog.db")
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
@@ -91,7 +94,7 @@ class CommentPost(db.Model):
     text = db.Column(db.Text, nullable=False)
 
 
-# db.create_all()
+db.create_all()
 
 login_manager = LoginManager()
 login_manager.init_app(app)
